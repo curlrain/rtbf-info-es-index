@@ -8,54 +8,6 @@ import json
 from lxml import html as H
 
 
-def get_text(soup):
-    try:
-        text = re.sub(r'\n+', ' ', soup.get_text())
-        return re.sub(r'\s+', ' ', text)
-    except:
-        return ""
-
-def get_article(soup):
-    try:
-        text = soup.find('article').get_text()
-        return text
-    except:
-        print("empty")
-        return ""
-
-def get_textualContent(soup):
-    text = soup.find("div", {"class":"textualContent"}).get_text()
-    return text
-
-
-def get_title(soup):
-    return soup.title.text
-
-
-def get_date(soup):
-    try:
-        date = soup.find("span", { "class" : "date updatedNews" }).get_text()
-        print(date)
-        return date
-    except:
-        print("nothing")
-
-
-def parser(inputfile='res/rtbf_info_urls.txt', outputfile='res/rtbf_info_index.json'):
-    with open(inputfile, 'r') as file:
-        url_set = {line.rstrip('\n') for line in file}
-    representation = ddict()
-    for url in url_set:
-        html = BeautifulSoup(requests.get(url).text)
-        representation[xxh32(url).intdigest()] = {'url': url,
-                                                  'text': get_text(html),
-                                                  'title': get_title(html),
-                                                  'date': get_date(html)}
-    json_string = json.dumps(representation, file, indent=2)
-    with open(outputfile, 'w') as file:
-        file.write(json_string)
-
-
 def parse_rtbf_info(url):
     document_dict = ddict()
     try:
