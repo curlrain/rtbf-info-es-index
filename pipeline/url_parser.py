@@ -9,7 +9,7 @@ from lxml import html as H
 import sys
 from __future__ import print_function
 
-
+pattern = re.compile(r'[\t\r\s,]+')
 def parse_rtbf_info(url):
     document_dict = ddict()
     try:
@@ -25,7 +25,10 @@ def parse_rtbf_info(url):
         except:
             document_dict["header"] = ""
         try:
-            document_dict["keywords"] = dom.xpath('//article//div[@class="keywords"]//ul//text()')
+            keywords = dom.xpath('//article//div[@class="keywords"]//ul//text()')
+            keywords = list(map(lambda x: re.sub(pattern, " ", x), keywords))
+            keywords = list(set(filter(lambda x: x != ' ', keywords)))
+            document_dict["keywords"] = keywords
         except:
             document_dict["keywords"] = []
         try:
@@ -57,7 +60,7 @@ len(content)
 black_list = ["archiveparmotcle_", "emissions?", "/photo/"]
 
 index = {"id" + str(xxh32(url).intdigest()): parse_rtbf_info(url)
-         for url in content[0:300] if any(s in url for s in black_list) == False}
+         for url in content[0:20] if any(s in url for s in black_list) == False}
 
 
 index_json_string = json.dumps(index, indent=4)
