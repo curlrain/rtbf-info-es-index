@@ -6,6 +6,8 @@ from xxhash import xxh32
 from collections import defaultdict as ddict
 import json
 from lxml import html as H
+import sys
+from __future__ import print_function
 
 
 def parse_rtbf_info(url):
@@ -15,11 +17,11 @@ def parse_rtbf_info(url):
         dom = H.fromstring(connection.text)
         document_dict['url'] = url
         try:
-            document_dict["title"] = dom.xpath('//title//text()')
+            document_dict["title"] = " ".join(dom.xpath('//title//text()'))
         except:
             document_dict["title"] = ""
         try:
-            document_dict["header"] = dom.xpath('//article//header//text()')
+            document_dict["header"] = " ".join(dom.xpath('//article//header//text()'))
         except:
             document_dict["header"] = ""
         try:
@@ -31,9 +33,13 @@ def parse_rtbf_info(url):
         except:
             document_dict["textualContent"] = ""
         try:
-            raw_date = dom.xpath('//span//@class="date updatedNews"')
-            date = raw_date[14:-8]
-            hour = raw_date[-5:]
+            raw_date = list(dom.xpath('//div[@id="mainContent"]//span[@class="date"]//text()'))
+            if len(raw_date[0]) > 10:
+                date = raw_date[0][:-7]
+                hour = raw_date[0][-5:]
+            else:
+                date = raw_date
+                hour = ""
             document_dict["date"] = date
             document_dict["hour"] = hour
         except:
@@ -47,13 +53,23 @@ def parse_rtbf_info(url):
 with open('res/rtbf_info_urls.txt', 'r') as f:
     content = list(set(f))
 
-black_list =["archiveparmotcle_", "emissions?", "/photo/"]
+len(content)
+black_list = ["archiveparmotcle_", "emissions?", "/photo/"]
 
-index = [parse_rtbf_info(url) for url in content[0:300] if any(s not in url for s in black_list)]
+index = {"id" + str(xxh32(url).intdigest()): parse_rtbf_info(url)
+         for url in content[0:300] if any(s in url for s in black_list) == False}
+
+
+index_json_string = json.dumps(index, indent=4)
+with open("res/rtbf_info_dev_index.json", "w") as file:
+    file.write(index_json_string)
+print("done")
 len(index)
-for el in index[0:10]:
-    print(el["title"])
-    print(el["header"])
-    print(el["textualContent"])
+type(index)
+for id, doc in index.items():
+    # print(type(doc["title"]))
+    # print(type(doc["header"]))
+    # print(type(doc["textualContent"]))
+    print(doc["date"])
     print("-----------------------------------")
 
