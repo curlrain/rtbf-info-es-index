@@ -60,11 +60,11 @@ len(content)
 black_list = ["archiveparmotcle_", "emissions?", "/photo/"]
 
 index = {"id" + str(xxh32(url).intdigest()): parse_rtbf_info(url)
-         for url in content[0:20] if any(s in url for s in black_list) == False}
+         for url in content[0:500] if any(s in url for s in black_list) == False}
 
 
 index_json_string = json.dumps(index, indent=4)
-with open("res/rtbf_info_dev_index.json", "w") as file:
+with open("res/indices/rtbf_info_dev_index.json", "w") as file:
     file.write(index_json_string)
 print("done")
 len(index)

@@ -5,8 +5,8 @@ import json
 from datetime import datetime
 import re
 
-index_name = 'my_index'
-type_name = 'html_doc'
+index_name = 'rtbf-infos'
+type_name = 'article'
 
 HostName = 'localhost'
 port = '9200'
@@ -14,6 +14,7 @@ ES = Elasticsearch(HostName + ':' + port, timeout=4)
 
 with open('res/rtbf_info_dev_index.json', 'r') as file:
     data = json.load(file)
+
 
 for id, doc_representation in data.items():
     ES.index(body=doc_representation, index=index_name, doc_type=type_name, id=id)

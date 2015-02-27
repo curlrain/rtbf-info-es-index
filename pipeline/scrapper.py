@@ -35,12 +35,12 @@ url = 'http://www.rtbf.be/info/'
 url_set = set()
 domain = 'http://www.rtbf.be/info'
 i = 0
-crawled_set = crawl(url, url_set, domain, iter=0, file='res/rtbf_info_urls.txt', maxiter=20)
+crawled_set = crawl(url, url_set, domain, iter=0, file='res/rtbf_info_urls_100.txt', maxiter=100)
 print('done')
 crawled_set
 type(crawled_set)
 
-with open('res/rtbf_info_urls.txt', 'r') as f:
+with open('res/rtbf_info_urls_100.txt', 'r') as f:
     content = list(f)
 for el in content:
     print(el)
