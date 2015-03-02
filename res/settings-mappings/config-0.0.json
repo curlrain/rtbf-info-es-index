@@ -1,5 +1,4 @@
 {
-  "creation_date": 1407751337000,
   "settings": {
     "number_of_shards": 1,
     "number_of_replicas": 1,
@@ -48,31 +47,31 @@
       "article": {
         "properties": {
           "textualContent": {
-            "type": "String",
+            "type": "string",
             "index": "analyzed",
             "analyzer": "french"
           },
           "title": {
-            "type": "String",
+            "type": "string",
             "index": "analyzed",
             "analyzer": "french"
           },
           "header": {
-            "type": "String",
+            "type": "string",
             "index": "analyzed",
             "analyzer": "french"
           },
           "keywords": {
-            "type": "String",
+            "type": "string",
             "index": "analyzed",
             "analyzer": "french"
           },
           "url": {
-            "type": "String",
+            "type": "string",
             "index": "not_analyzed"
           },
           "date": {
-            "type": "String",
+            "type": "string",
             "index": "not_analyzed"
           }
         }

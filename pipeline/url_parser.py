@@ -53,18 +53,18 @@ def parse_rtbf_info(url):
         pass
 
 # testing the code on a subsample
-with open('res/rtbf_info_urls.txt', 'r') as f:
+with open('res/rtbf_info_urls_100.txt', 'r') as f:
     content = list(set(f))
 
 len(content)
 black_list = ["archiveparmotcle_", "emissions?", "/photo/"]
 
 index = {"id" + str(xxh32(url).intdigest()): parse_rtbf_info(url)
-         for url in content[0:500] if any(s in url for s in black_list) == False}
+         for url in content if any(s in url for s in black_list) is False}
 
-
+print(len(index))
 index_json_string = json.dumps(index, indent=4)
-with open("res/indices/rtbf_info_dev_index.json", "w") as file:
+with open("res/indices/rtbf_info_prod_index.json", "w") as file:
     file.write(index_json_string)
 print("done")
 len(index)

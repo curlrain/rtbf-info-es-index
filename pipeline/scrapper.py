@@ -9,6 +9,17 @@ import lxml.html
 
 
 def crawl(address, address_set, domain, iter, file, maxiter=6):
+    """
+    This function crawl the web and save the url of the crawled page. Given a initial url and a domain, it opens every
+    link in that page then every link in the open page if they satisfy 3 confitions. It is a recursive algorithm.
+    :param address: str: the url of the initial page
+    :param address_set: a set of url to add the crawled page. if the page has already been scrolled it's not add
+    :param domain: str: a domain where to scroll
+    :param iter: int: serve to stop the recursion
+    :param file: str: the path of the text file where to save the result
+    :param maxiter: int
+    :return:
+    """
     if address not in address_set and domain in address and iter < maxiter:
         # json.dumps(address)
         address_set.add(address)
