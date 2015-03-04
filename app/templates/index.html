@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    {% extends "base.html" %}
+    {% block content %}
+        <h1>Hi, {{ user.nickname }}!</h1>
+        {% for post in posts %}
+            <div><p>{{ post.author.nickname }} dit: <b>{{ post.body }}</b></p></div>
+        {% endfor %}
+    {% endblock %}
+</html>
