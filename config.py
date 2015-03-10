@@ -1,13 +1,25 @@
 __author__ = 'fabienngo'
 
-from elasticsearch import Elasticsearch
-from elasticsearch.client import IndicesClient
-import json
-from datetime import datetime
-import re
 
-index_name = 'rtbf-infos'
-type_name = 'article'
+query_template = {
+  "query": {
+    "bool": {
+      "should": {
+        "multi_match": {
+          "query": "Belgique",
+          "type": "cross_fields",
+          "fields": [
+            "title^2",
+            "textualContent^0.75",
+            "keywords",
+            "header^1.5"
+          ],
+          "minimum_should_match": "75%"
+        }
+      }
+    }
+  }
+}
 
 def config():
     return """{
@@ -91,41 +103,3 @@ def config():
         }
     }
 }"""
-
-
-
-HostName = 'localhost'
-port = '9200'
-ES = Elasticsearch(HostName + ':' + port, timeout=5)
-
-ES.indices.create(index=index_name, body=config())
-with open('res/indices/rtbf_info_prod_index.json', 'r') as file:
-    data = json.load(file)
-
-data
-for id, doc_representation in data.items():
-    ES.index(body=doc_representation, index=index_name, doc_type=type_name, id=id)
-
-query_template = {
-  "query": {
-    "bool": {
-      "should": {
-        "multi_match": {
-          "query": "attaque terroriste verviers",
-          "type": "cross_fields",
-          "fields": [
-            "title^2",
-            "textualContent^0.75",
-            "keywords",
-            "header^1.5"
-          ],
-          "minimum_should_match": "75%"
-        }
-      }
-    }
-  }
-}
-
-response = ES.search(index=index_name, doc_type=type_name, body=query_template)
-response["hits"]['hits']
-

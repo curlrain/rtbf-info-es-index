@@ -1,20 +1,23 @@
 __author__ = 'fabienngo'
-import requests
 import re
-from bs4 import BeautifulSoup
-from xxhash import xxh32
 from collections import defaultdict as ddict
 import json
-from lxml import html as H
-import sys
-from __future__ import print_function
+from lxml import html
+# from __future__ import print_function
+import argparse
+import os
+import glob
 
-pattern = re.compile(r'[\t\r\s,]+')
-def parse_rtbf_info(url):
+CORPUS_PREFIX = '../res/rtbf_info_corpus_'
+INDEX_PREFIX = "../res/indices/rtbf_info_index_"
+PATTERN = re.compile(r'[\t\r\s,]+')
+BLACK_LIST = ["archiveparmotcle_", "emissions?", "/photo/"]
+
+
+def parse(url, source):
     document_dict = ddict()
     try:
-        connection = requests.get(url)
-        dom = H.fromstring(connection.text)
+        dom = html.fromstring(source)
         document_dict['url'] = url
         try:
             document_dict["title"] = " ".join(dom.xpath('//title//text()'))
@@ -26,7 +29,7 @@ def parse_rtbf_info(url):
             document_dict["header"] = ""
         try:
             keywords = dom.xpath('//article//div[@class="keywords"]//ul//text()')
-            keywords = list(map(lambda x: re.sub(pattern, " ", x), keywords))
+            keywords = list(map(lambda x: re.sub(PATTERN, " ", x), keywords))
             keywords = list(set(filter(lambda x: x != ' ', keywords)))
             document_dict["keywords"] = keywords
         except:
@@ -39,7 +42,9 @@ def parse_rtbf_info(url):
             raw_date = list(dom.xpath('//div[@id="mainContent"]//span[@class="date"]//text()'))
             if len(raw_date[0]) > 10:
                 date = raw_date[0][:-7]
+                date = re.sub(r'^\s|\s$', "", date)
                 hour = raw_date[0][-5:]
+                hour = re.sub(r'^\s|\s$', "", hour)
             else:
                 date = raw_date
                 hour = ""
@@ -52,27 +57,28 @@ def parse_rtbf_info(url):
     except:
         pass
 
-# testing the code on a subsample
-with open('res/rtbf_info_urls_100.txt', 'r') as f:
-    content = list(set(f))
 
-len(content)
-black_list = ["archiveparmotcle_", "emissions?", "/photo/"]
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-v', '--version', type=str,
+                        help='version number. the version number of the corpus folder')
+    parser.add_argument('-o', '--output', type=str,
+                        help='filename where the index is saved')
 
-index = {"id" + str(xxh32(url).intdigest()): parse_rtbf_info(url)
-         for url in content if any(s in url for s in black_list) is False}
+    args = parser.parse_args()
+    path = CORPUS_PREFIX + args.version
+    index = {'id_temp': {"key": "value"}}
 
-print(len(index))
-index_json_string = json.dumps(index, indent=4)
-with open("res/indices/rtbf_info_prod_index.json", "w") as file:
-    file.write(index_json_string)
-print("done")
-len(index)
-type(index)
-for id, doc in index.items():
-    # print(type(doc["title"]))
-    # print(type(doc["header"]))
-    # print(type(doc["textualContent"]))
-    print(doc["date"])
-    print("-----------------------------------")
+    for infile in glob.glob(os.path.join(path, '*.json')):
+        id = infile[len(path)+1:-5]
+        with open(infile, 'r') as f:
+            d = json.load(f)
+            if any(s in d["url"] for s in BLACK_LIST) is False:
+                index[id] = parse(d['url'], d['source'])
+    del index['id_temp']
+    index_json_string = json.dumps(index, indent=4)
+    with open(INDEX_PREFIX + args.output + ".json", "w") as file:
+        file.write(index_json_string)
+    print("done")
+
 
