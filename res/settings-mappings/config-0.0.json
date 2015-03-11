@@ -22,6 +22,11 @@
             "puisqu"
           ]
         },
+        "filter" : {
+                "synonym" : {
+                    "type" : "synonym",
+                    "synonyms_path" : "/rtbf-info-syn.txt"
+                },
         "french_stop": {
           "type": "stop",
           "stopwords": "_french_"

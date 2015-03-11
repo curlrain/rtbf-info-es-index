@@ -9,7 +9,7 @@ import argparse
 
 INDEX_PREFIX = "res/indices/rtbf_info_index_"
 
-
+# TODO Change this awfull UI
 def es_index(path, index_name, type_name, hostname, port, is_create):
     ES = Elasticsearch(hostname + ':' + port, timeout=5)
     if is_create:
