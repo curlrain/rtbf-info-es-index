@@ -18,7 +18,7 @@ def es_index_collection(source_collection,
                         hostname, port,
                         is_create, config_file,
                         htmlparser=rtbf_info_parser):
-    with open('res/settings-mappings/' + config_file, 'r') as file:
+    with open('./res/settings-mappings/' + config_file, 'r') as file:
         es_config = json.loads(file.read())
     ES = Elasticsearch(hostname + ':' + port, timeout=5)
     name = index_name + "_" + version
@@ -29,7 +29,10 @@ def es_index_collection(source_collection,
         if any(s in html_dict["url"] for s in BLACK_LIST) is False:
             _id = xxh32(html_dict['url']).intdigest()
             doc = htmlparser(html_dict['url'], html_dict['source'])
-            ES.index(body=doc, index=name, doc_type=type_name, id=_id)
+            if len(doc['textualContent']) != 0:
+                ES.index(body=doc, index=name, doc_type=type_name, id=_id)
+
+# TODO define a es_index function that index only one document.
 
 if __name__ == "__main__":
 

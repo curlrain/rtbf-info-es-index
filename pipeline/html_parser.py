@@ -42,7 +42,7 @@ def rtbf_info_parser(url, source):
         except:
             document_dict["textualContent"] = ""
         try:
-            document_dict["published_date"] = "".join(dom.xpath(".//meta[@property='article:published_time']/@content"))
+            document_dict["published_date"] = "".join(dom.xpath(".//meta[@property='article:published_time']/@content"))[:-14]
 
             # raw_date = list(dom.xpath('//div[@id="mainContent"]//span[@class="date"]//text()'))
             # if len(raw_date[0]) > 10:
@@ -55,15 +55,15 @@ def rtbf_info_parser(url, source):
             #     hour = ""
 
         except:
-            document_dict["published_date"] = ""
+            pass
         try:
-            document_dict["modified_date"] = "".join(dom.xpath(".//meta[@property='article:modified_time']/@content"))
+            document_dict["modified_date"] = "".join(dom.xpath(".//meta[@property='article:modified_time']/@content"))[:-14]
 
         except:
-            document_dict["modified_date"] = ''
+            pass
         try:
             author = dom.xpath('//article//div[@class="textualContent"]/p/strong//text()')[-1]
-            document_dict['author'] = author.replace('\xa0','')
+            document_dict['author'] = author.replace('\xa0', '')
 
         except:
             document_dict['author'] = ''
@@ -75,3 +75,4 @@ def rtbf_info_parser(url, source):
 
 
 
+len("T16:50:00+0100")

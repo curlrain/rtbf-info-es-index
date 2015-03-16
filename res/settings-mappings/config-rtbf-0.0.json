@@ -22,81 +22,75 @@
                         "puisqu"
                     ]
                 },
-                "filter": {
-                    "synonym": {
-                        "type": "synonym",
-                        "synonyms_path": "/rtbf-info-syn.txt"
-                    },
-                    "french_stop": {
-                        "type": "stop",
-                        "stopwords": "_french_"
-                    },
-                    "french_stemmer": {
-                        "type": "stemmer",
-                        "language": "light_french"
-                    }
+                "french_stop": {
+                    "type": "stop",
+                    "stopwords": "_french_"
                 },
-                "analyzer": {
-                    "french": {
-                        "tokenizer": "standard",
-                        "filter": [
-                            "french_elision",
-                            "lowercase",
-                            "french_stop",
-                            "french_stemmer"
-                        ]
-                    }
+                "french_stemmer": {
+                    "type": "stemmer",
+                    "language": "light_french"
                 }
             },
-            "mappings": {
-                "rtbf_article": {
-                    "properties": {
-                        "textualContent": {
-                            "type": "string",
-                            "index": "analyzed",
-                            "analyzer": "french"
-                        },
-                        "title": {
-                            "type": "string",
-                            "index": "analyzed",
-                            "analyzer": "french"
-                            "similarity": "BM25"
-                        },
-                        "header": {
-                            "type": "string",
-                            "index": "analyzed",
-                            "analyzer": "french"
-                            "similarity": "BM25"
-                        },
-                        "keywords": {
-                            "type": "string",
-                            "index": "analyzed",
-                            "analyzer": "french",
-                            "similarity": "BM25"
-                        },
-                        "news_keywords":{
-                          "type": "string",
-                          "index": "analyzed",
-                          "analyzer": "french",
-                          "similarity": "BM25"
-                        },
-                        "author":{
-                          "type": "string",
-                          "index": "analyzed",
-                          "analyzed": "french"
-                        },
-                        "url": {
-                            "type": "string",
-                            "index": "not_analyzed"
-                        },
-                        "published_date": {
-                            "type": "date",
-                            "format": "date_time_no_millis"
-                        },
-                        "modified_date":{
-                          "type":"date",
-                          "format":"date_time_no_millis"
-                        }
+            "analyzer": {
+                "french": {
+                    "tokenizer": "standard",
+                    "filter": [
+                        "french_elision",
+                        "lowercase",
+                        "french_stop",
+                        "french_stemmer"
+                    ]
+                }
+            }
+        },
+        "mappings": {
+            "rtbf_article": {
+                "properties": {
+                    "textualContent": {
+                        "type": "string",
+                        "index": "analyzed",
+                        "analyzer": "french"
+                    },
+                    "title": {
+                        "type": "string",
+                        "index": "analyzed",
+                        "analyzer": "french",
+                        "similarity": "BM25"
+                    },
+                    "header": {
+                        "type": "string",
+                        "index": "analyzed",
+                        "analyzer": "french",
+                        "similarity": "BM25"
+                    },
+                    "keywords": {
+                        "type": "string",
+                        "index": "analyzed",
+                        "analyzer": "french",
+                        "similarity": "BM25"
+                    },
+                    "news_keywords": {
+                        "type": "string",
+                        "index": "analyzed",
+                        "analyzer": "french",
+                        "similarity": "BM25"
+                    },
+                    "author": {
+                        "type": "string",
+                        "index": "analyzed",
+                        "analyzer": "french"
+                    },
+                    "url": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "published_date": {
+                        "type": "date",
+                        "format": "date"
+                    },
+                    "modified_date": {
+                        "type": "date",
+                        "format": "yyyy-MM-dd"
                     }
                 }
             }

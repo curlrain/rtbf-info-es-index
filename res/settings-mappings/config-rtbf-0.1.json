@@ -1,0 +1,105 @@
+{
+    "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 1,
+        "analysis": {
+            "filter": {
+                "french_elision": {
+                    "type": "elision",
+                    "articles": [
+                        "l",
+                        "m",
+                        "t",
+                        "qu",
+                        "n",
+                        "s",
+                        "j",
+                        "d",
+                        "c",
+                        "jusqu",
+                        "quoiqu",
+                        "lorsqu",
+                        "puisqu"
+                    ]
+                },
+            
+                "french_stop": {
+                    "type": "stop",
+                    "stopwords": "_french_"
+                },
+                "french_stemmer": {
+                    "type": "stemmer",
+                    "language": "light_french"
+                    }
+                },
+                "synonym": {
+                    "type": "synonym",
+                    "synonyms_path": "/rtbf-info-syn.text"
+                    },
+            "analyzer": {
+                "french": {
+                    "tokenizer": "standard",
+                    "filter": [
+                            "synonym",
+                            "french_elision",
+                            "lowercase",
+                            "french_stop",
+                            "french_stemmer"
+                            ]
+                }
+            },
+            "mappings": {
+                "rtbf_article": {
+                    "properties": {
+                        "textualContent": {
+                            "type": "string",
+                            "index": "analyzed",
+                            "analyzer": "french"
+                        },
+                        "title": {
+                            "type": "string",
+                            "index": "analyzed",
+                            "analyzer": "french",
+                            "similarity": "BM25"
+                        },
+                        "header": {
+                            "type": "string",
+                            "index": "analyzed",
+                            "analyzer": "french",
+                            "similarity": "BM25"
+                        },
+                        "keywords": {
+                            "type": "string",
+                            "index": "analyzed",
+                            "analyzer": "french",
+                            "similarity": "BM25"
+                        },
+                        "news_keywords":{
+                          "type": "string",
+                          "index": "analyzed",
+                          "analyzer": "french",
+                          "similarity": "BM25"
+                        },
+                        "author":{
+                          "type": "string",
+                          "index": "analyzed",
+                          "analyzer": "french"
+                        },
+                        "url": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        },
+                        "published_date": {
+                            "type": "date",
+                            "format": "date_time_no_millis"
+                        },
+                        "modified_date":{
+                          "type":"date",
+                          "format":"date_time_no_millis"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
