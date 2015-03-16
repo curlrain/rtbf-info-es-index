@@ -1,114 +1,100 @@
 __author__ = 'fabienngo'
 import requests
 import re
-from xxhash import xxh32
 import json
 import lxml.html
-from time import time
+import xxhash
 import argparse
-import os
-import sys
-sys.path.append('/pipeline')
-from parse import parse
-# from config import url_init, url_set
+from redis import Redis
+from pymongo import MongoClient
 
-URL = 'http://www.rtbf.be/info/'
 DOMAIN = 'http://www.rtbf.be/info/'
-URL_PREFIX = '../res/rtbf_info_urls_'
-CORPUS_PREFIX = '../res/rtbf_info_corpus_'
-TXT_SUFFIX = ".txt"
-JSON_SUFFIX = '.json'
-ID_PREFIX = "/id_"
-INDEX_PREFIX = "../res/indices/rtbf_info_index_"
-PATTERN = re.compile(r'[\t\r\s,]+')
-START = time()
 BLACK_LIST = ["archiveparmotcle_", "emissions?", "/photo/"]
+_ID_KEY = '_id'
+SOURCE_KEY = 'source'
+HTML_KEY = 'html'
+URL_KEY = 'url'
 
 
-def crawl(address, address_set, domain, version, epoch=0, maxiter=6.0, is_time=False):
+def crawl_to_db(address, url_collection, source_collection, epoch=0, maxiter=6.0):
     """
-    This function crawl the web and save the source of the crawled page. Given a initial url and a domain, it opens every
-    link in that page then every link in the open recursively pages if they satisfy some confitions.
-    :param address: str: the url of the initial page
-    :param address_set: a set of url to add the crawled page. if the page has already been scrolled it's not add
-    :param domain: str: a domain where to scroll
-    :param epoch: int: serve to stop the recursion
-    :param file: str: the path of the text file where to save the result
-    :param maxiter: int
+
+    :param address: str the first url to be crawled
+    :param domain:
+    :param redis_client:
+    :param epoch:
+    :param maxiter:
+    :param is_time:
     :return:
     """
 
-    if address not in address_set and domain in address and epoch < maxiter:
-        address_set.add(address)
-        print(len(address_set))
+    is_member = bool(url_collection.find_one({'url': {"$eq": address}}))
+    if not is_member and DOMAIN in address and epoch < maxiter:
+
+        url_collection.save({_ID_KEY: xxhash.xxh32(address).intdigest(), URL_KEY: address})
+        print(url_collection.count())
+        print(source_collection.count())
         print(address)
-        print(epoch)
-        if is_time:
-            end = time()
-            epoch = end - START
-        else:
-            epoch += 1
-        try:
-            with open(URL_PREFIX + version + TXT_SUFFIX, 'a') as f:
-                f.write(address + "\n")
-        except:
-            print("IOError : counldn't save file urls in " + URL_PREFIX + version + TXT_SUFFIX)
-        try:
-            connection = requests.get(address)
-            dom = lxml.html.fromstring(connection.text)
+        epoch += 1
 
+        try:
             if any(s in address for s in BLACK_LIST) is False:
-                document = parse(address, connection.text)
-                json_string = json.dumps(document, indent=4)
-                with open(INDEX_PREFIX + version + ID_PREFIX + str(xxh32(address).intdigest()) + JSON_SUFFIX, "w") as f:
-                    f.write(json_string)
-
-            for link in dom.xpath('//a/@href'): # select the url in href for all a tags(links)
-                crawl(link, address_set, domain, version, epoch, maxiter, is_time)
+                source = requests.get(address).text
+                html_dict = {_ID_KEY: address, SOURCE_KEY: source}
+                source_collection.save(html_dict)
+                dom = lxml.html.fromstring(source)
+                for link in dom.xpath('//a/@href'):  # select the url in href for all a tags(links)
+                    crawl_to_db(link, url_collection, source_collection, epoch, maxiter)
         except:
-            print("IOError : counldn't save file in " + URL_PREFIX + version)
+            print("couldn't connect")
             pass
-    else:
-        return address_set
 
+
+def recrawl(urls_set, url_collection, source_collection):
+    for url in urls_set:
+        temp_dict = {_ID_KEY: xxhash.xxh32(url).intdigest(), URL_KEY: url}
+        url_collection.save(temp_dict)
+        print(url_collection.count())
+        if any(s in url for s in BLACK_LIST) is False:
+            try:
+                source = requests.get(url).text
+                temp_dict[SOURCE_KEY] = source
+                source_collection.save(temp_dict)
+                print(source_collection.count())
+            except:
+                pass
+    return
+
+
+#
+# with open('res/rtbf_info_urls.txt', 'r') as file:
+#     urlSet = {url[:-1] for url in file.readlines()}
+#
+#
+# m_client = MongoClient('localhost', 27017)
+# mongo_db = m_client['rtbf-info-db']
+# db_source = mongo_db['source-collection']
+# db_url = mongo_db['url_collection']
+# recrawl(list(urlSet)[36846:], url_collection=db_url, source_collection=db_source)
+
+
+c = requests.get(DOMAIN)
+c.text
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-
     parser.add_argument('-u', '--url', type=str, default='http://www.rtbf.be/info/',
-                        help='initial url web page',
-                        )
-    #
-    # parser.add_argument('-s', '--set', type=str, default='http://www.rtbf.be/info/',
-    #                     help='web domain to be considered for crawling')
-
-    parser.add_argument('-s', '--set', action='store_true',
-                        help='if activated a file containing urls already crawled must be given')
-
-    parser.add_argument('-f', '--file', type=str,
-                        help='the file with urls already crawled')
-
-    parser.add_argument('-v', '--version', type=str, default="0",
-                        help='version number. Give a version number to the output files')
-
-    parser.add_argument("-t", '--time', action='store_true',
-                        help='if added consider the execution time as stopping condition for the recursion')
-
-    parser.add_argument("-m", '--mepoch', type=float, default=3,
+                        help='initial url web page')
+    parser.add_argument('-h', '--host', type=str, default='localhost')
+    parser.add_argument('-p', '--port', type=int, default=27017)
+    parser.add_argument("-m", '--mepoch', type=int, default=3,
                         help='max number of epoch')
 
     args = parser.parse_args()
-    if args.set:
-        with open(args.file, 'r') as f:
-            url_set = set(f.readlines())
-    else:
-        url_set = set()
-    i = 0
-    os.mkdir(INDEX_PREFIX + args.version)
-    crawled_set = crawl(args.url,
-                        url_set,
-                        DOMAIN,
-                        epoch=0,
-                        version=args.version,
-                        maxiter=args.mepoch,
-                        is_time=args.time)
+
+    mongo_client = MongoClient(host=args.host, port=args.host)
+    mongo_db = mongo_client['rtbf-info-db']
+    db_source = mongo_db['source-collection']
+    db_url = mongo_db['url_collection']
+    db_url.remove(spec_or_id=DOMAIN)
+    crawl_to_db(args.url, db_url, db_source, epoch=0, maxiter=args.mepoch)
 
