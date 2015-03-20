@@ -1,0 +1,21 @@
+{
+  "query": {
+    "bool": {
+      "should": {
+        "multi_match": {
+          "query": "",
+          "type": "cross_fields",
+          "fields": [
+            "title^3",
+            "news_keywords^2",
+            "keywords^1.5",
+            "header^1",
+            "textualContent^0.75"
+          ],
+          "minimum_should_match": "75%"
+        }
+      }
+    }
+  }
+}
+

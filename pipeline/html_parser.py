@@ -75,4 +75,3 @@ def rtbf_info_parser(url, source):
 
 
 
-len("T16:50:00+0100")

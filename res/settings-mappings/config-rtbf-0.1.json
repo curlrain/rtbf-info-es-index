@@ -33,16 +33,18 @@
                     }
                 },
                 "synonym": {
+                    "expand":"true",
                     "type": "synonym",
-                    "synonyms_path": "/rtbf-info-syn.text"
+                    "ignore_case": "true",
+                    "synonyms_path": "rtbf-info-syn.text"
                     },
             "analyzer": {
                 "french": {
                     "tokenizer": "standard",
                     "filter": [
-                            "synonym",
                             "french_elision",
                             "lowercase",
+                            "synonym",
                             "french_stop",
                             "french_stemmer"
                             ]

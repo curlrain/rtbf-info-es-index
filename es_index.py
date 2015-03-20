@@ -27,7 +27,7 @@ def es_index_collection(source_collection,
 
     for html_dict in source_collection.find():
         if any(s in html_dict["url"] for s in BLACK_LIST) is False:
-            _id = xxh32(html_dict['url']).intdigest()
+            _id = html_dict['_id']
             doc = htmlparser(html_dict['url'], html_dict['source'])
             if len(doc['textualContent']) != 0:
                 ES.index(body=doc, index=name, doc_type=type_name, id=_id)
@@ -37,7 +37,7 @@ def es_index_collection(source_collection,
 if __name__ == "__main__":
 
     parser = ConfigParser()
-    parser.read('./res/config.INI')
+    parser.read('./res/config_indexer.INI')
 
     #ElasticSearch Options
     es_host = parser.get('ElasticSearch', 'hostname')
@@ -67,7 +67,7 @@ if __name__ == "__main__":
                         port=es_port,
                         is_create=create,
                         config_file=config)
-
+    print("done!")
 # index_name = 'rtbf-infos-test'
 # type_name = 'article'
 #

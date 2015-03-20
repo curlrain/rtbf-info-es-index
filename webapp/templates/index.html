@@ -1,0 +1,35 @@
+<html>
+	<head>
+		<title>RTBF search - MVP v.0.0 </title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+	</head>
+	<body>
+		<form>
+			Rechercher : <input type="text" name="searchnews"> <input type="Submit" value="Submit">
+            <input type="checkbox" name="remember" checked="checked"> Remember<br/ >
+		</form>
+		<h1>Resultats de votre recherche </h1>
+
+			{% for result in results_list %}
+            <table>
+                <td> <font color="354EF6" size="4">{{result[0]}}</font></td>
+            </table>
+            <table>
+                <font size="2">Publié le {{result[3]}} :</font>
+                <a href={{result[1]}}>   <font color="green" size="2">{{result[1]}}</font></a>
+
+            </table>
+
+            <p>
+                   <font size="3">{{result[2]}}</font>
+            </p>
+
+
+
+
+
+			{% endfor %}
+
+	</body>
+</html>

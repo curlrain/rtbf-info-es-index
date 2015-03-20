@@ -41,7 +41,7 @@ with open('res/raw_synonyms.json', 'r') as f:
     synonyms_dict = json.load(f)
 
 
-synonyms_list = [ ", ".join(v + [k]) for k, v in synonyms_dict.items() if v != []]
+synonyms_list = [", ".join(v + [k]) for k, v in synonyms_dict.items() if v != []]
 len(synonyms_list)
 synonyms_list
 
