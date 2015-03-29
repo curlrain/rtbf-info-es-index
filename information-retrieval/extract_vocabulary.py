@@ -40,3 +40,4 @@ with open('../res/keywords_.txt', 'a') as f:
     for keyword in vocabulary_set:
         s = keyword.replace(" ", "_")
         f.write(keyword + "\n")
+

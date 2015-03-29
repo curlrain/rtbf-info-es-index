@@ -6,26 +6,25 @@ from flask import request
 
 import datetime
 import os
-import json
 from elasticsearch import Elasticsearch
 
 app = Flask(__name__)
 ES_HOSTNAME = 'localhost'
 ES_PORT = '9200'
 ES = Elasticsearch(ES_HOSTNAME + ':' + ES_PORT, timeout=10)
-
 RTBF_QUERY_PATH = "../res/query-templates/xfields_date_v0.json"
 
 with open(RTBF_QUERY_PATH, 'r') as file:
-    query_dict = json.load(file)
+    QUERY_STRING = file.read()
 
 
-def get_search_result(query_string, nresult=10):
-    query_dict['query']['function_score']['query']["filtered"]["query"]['bool']['should'][0]['multi_match']['query'] = query_string
-    query_dict['query']['function_score']['functions'][0]['exp']['published_date']['origin'] = str(datetime.datetime.today().date())
-    response = ES.search(body=query_dict, index='infos_0.2', doc_type='rtbf-info-article', size=nresult)
+def get_search_result(user_query, nresult=10):
+    q = QUERY_STRING.replace("%s", user_query).replace("%d", str(datetime.datetime.today().date()))
+
+    response = ES.search(body=q, index='infos_0.3', doc_type='rtbf-info-article', size=nresult)
     hits = response['hits']['hits']
     return [hit["_source"] for hit in hits]
+
 
 @app.route("/")
 def index():
@@ -47,8 +46,6 @@ def index():
         response.set_cookie("last_query", "{}".format(searchnews),
                             expires=datetime.datetime.today() + datetime.timedelta(days=365))
     return response
-
-
 
 
 if __name__ == '__main__':

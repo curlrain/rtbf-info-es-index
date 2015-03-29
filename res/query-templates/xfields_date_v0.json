@@ -1,42 +1,35 @@
 {
-  "query": {
-    "function_score":{
-      "query": {
-        "filtered": {
-          "query": {
-            "bool": {
-              "should": [
-                {
-                  "multi_match": {
-                    "query": "allo",
-                    "type": "cross_fields",
-                    "fields": [
-                      "title^3",
-                      "header^1",
-                      "textualContent^0.25"
-                    ],
-                    "minimum_should_match": "75%"
-                  }
+    "query": {
+        "function_score": {
+            "query": {
+                "filtered": {
+                    "query": {
+                        "multi_match": {
+                            "query": "%s",
+                            "type": "cross_fields",
+                            "fields": [
+                                "title^2",
+                                "header^1",
+                                "textualContent^1"
+                            ],
+                            "minimum_should_match": "100%"
+                        }
+                    }
                 }
-              ]
-            }
-          }
+            },
+            "functions": [
+                {
+                    "gauss": {
+                        "published_date": {
+                            "origin": "%d",
+                            "scale": "1d",
+                            "offset": 0,
+                            "decay": 0.3
+                        }
+                    }
+                }
+            ]
         }
-      },
-      "functions": [{
-        "exp": {
-          "published_date": {
-            "origin": "2015-03-20",
-            "scale": "1d",
-            "offset": 0,
-            "decay": 0.7
-          }
-        }
-
-      }
-      ]
     }
-  }
 }
-
 

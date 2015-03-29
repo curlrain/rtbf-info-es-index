@@ -4,11 +4,6 @@ from collections import defaultdict as ddict
 from lxml import html
 
 
-
-PATTERN = re.compile(r'[\t\r\s,]+')
-BLACK_LIST = ["archiveparmotcle_", "emissions?", "/photo/"]
-
-
 def rtbf_info_parser(url, source):
     document_dict = ddict()
     try:
@@ -22,13 +17,6 @@ def rtbf_info_parser(url, source):
             document_dict["header"] = " ".join(dom.xpath('//article//header//text()'))
         except:
             document_dict["header"] = ""
-        # try:
-        #     keywords = dom.xpath('//article//div[@class="keywords"]//ul//text()')
-        #     keywords = list(map(lambda x: re.sub(PATTERN, " ", x), keywords))
-        #     keywords = list(set(filter(lambda x: x != ' ', keywords)))
-        #     document_dict["keywords"] = keywords
-        # except:
-        #     document_dict["keywords"] = []
         try:
             document_dict['keywords'] = dom.xpath(".//meta[@name='keywords']/@content")
         except:
@@ -42,17 +30,8 @@ def rtbf_info_parser(url, source):
         except:
             document_dict["textualContent"] = ""
         try:
-            document_dict["published_date"] = "".join(dom.xpath(".//meta[@property='article:published_time']/@content"))[:-14]
-
-            # raw_date = list(dom.xpath('//div[@id="mainContent"]//span[@class="date"]//text()'))
-            # if len(raw_date[0]) > 10:
-            #     date = raw_date[0][1:-7]
-            #     date = re.sub(r'^\s|\s$', "", date)
-            #     hour = raw_date[0][-5:]
-            #     hour = re.sub(r'^\s|\s$', "", hour)
-            # else:
-            #     date = raw_date
-            #     hour = ""
+            document_dict["published_date"] = "".join(dom.xpath(".//meta[@property='article:published_time']"
+                                                                "/@content"))[:-14]
 
         except:
             pass

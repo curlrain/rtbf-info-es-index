@@ -18,12 +18,11 @@ URL_KEY = 'url'
 def crawl_to_db(address, url_collection, source_collection, epoch=0, maxepoch=6.0):
     """
 
-    :param address: str the first url to be crawled
-    :param domain:
-    :param redis_client:
+    :param address:
+    :param url_collection:
+    :param source_collection:
     :param epoch:
     :param maxepoch:
-    :param is_time:
     :return:
     """
 

@@ -39,16 +39,16 @@ if __name__ == "__main__":
     parser = ConfigParser()
     parser.read('./res/config_indexer.INI')
 
-    #ElasticSearch Options
+    # ElasticSearch Options
     es_host = parser.get('ElasticSearch', 'hostname')
     es_port = parser.get('ElasticSearch', 'port')
 
-    #Mongo DB options
+    # Mongo DB options
     db_host = parser.get('MongoDB', 'hostname')
     db_port = parser.getint('MongoDB', 'port')
     db_name = parser.get('MongoDB', 'db')
 
-    #Index options
+    # Index options
     index_name = parser.get('Index', 'name')
     type_name = parser.get('Index', 'type')
     version = parser.get('Index', 'version')
@@ -68,16 +68,4 @@ if __name__ == "__main__":
                         is_create=create,
                         config_file=config)
     print("done!")
-# index_name = 'rtbf-infos-test'
-# type_name = 'article'
-#
-# HostName = 'localhost'
-# port = '9200'
-#
-# version = 'test'
 
-
-
-
-# response = ES.search(index=index_name, doc_type=type_name, body=query_template)
-# response["hits"]['hits']
